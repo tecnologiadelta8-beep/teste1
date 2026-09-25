@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- ✅ PWA — Instalação do App -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#D4AF37">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="IBN Diamantino">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="description" content="Igreja Batista Nacional Diamantino — Família para pertencer">
+    <title>Igreja Batista Nacional Diamantino</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0A1A3F',
+                        secondary: '#D4AF37',
+                        accent: '#1E3A8A',
+                        light: '#F8F9FC',
+                        dark: '#0F172A'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        html { scroll-behavior: smooth; }
+        .video-card:hover { transform: translateY(-5px); transition: all 0.3s ease; }
+        
+        .hero-banner {
+            background: linear-gradient(rgba(10, 26, 63, 0.75), rgba(10, 26, 63, 0.65)), 
+                        url('banner-ibn.jpg');
+            background-size: cover;
+            background-position: center;
+            min-height: 85vh;
+            display: flex;
+            align-items: center;
+        }
+        .install-banner {
+            position: fixed;
+            bottom: 70px;
+            right: 20px;
+            max-width: 320px;
+            background: #fff9e6;
+            border: 1px solid #ffd900;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            z-index: 99;
+            display: none;
+        }
+        .radio-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #0A1A3F;
+            color: white;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 98;
+        }
+        .live-indicator {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+        .month-toggle {
+            cursor: pointer;
+            user-select: none;
+        }
+        .month-toggle:hover {
+            color: #D4AF37;
+        }
+        .month-videos {
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        .month-videos.collapsed {
+            max-height: 0;
+        }
+        .month-videos.expanded {
+            max-height: 3000px;
+        }
+        #mapaCelulas {
+            height: 450px;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+        }
+        @media (max-width: 768px) {
+            .hero-banner { min-height: 70vh; }
+            #mapaCelulas { height: 380px; }
+        }
+    </style>
+</head>
+<body class="bg-light text-gray-800 font-sans antialiased">
+    <!-- ✅ Aviso de Instalação do App -->
+    <div id="installBanner" class="install-banner p-4">
+        <div class="flex items-start gap-3">
+            <div class="flex-1">
+                <p class="font-bold text-primary mb-1">Instalar App IBN</p>
+                <p class="text-sm text-gray-600 mb-3">Acesse mais rápido, mesmo offline</p>
+                <button id="btnInstalar" class="bg-secondary text-primary px-4 py-2 rounded-md font-bold w-full hover:bg-yellow-400">
+                    <i class="fa fa-download mr-2"></i> Instalar Agora
+                </button>
+            </div>
+            <button id="btnFecharAviso" class="text-gray-400 hover:text-gray-600 text-xl">&times;</button>
+        </div>
+    </div>
+    <!-- ✅ Cabeçalho com TODOS os links atualizados — tudo conectado -->
+    <header class="bg-primary/95 text-white sticky top-0 z-50 shadow-md backdrop-blur-sm">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+            <a href="#inicio" class="flex items-center gap-2">
+                <span class="text-2xl font-bold text-secondary">IBN</span>
+                <span class="hidden sm:inline text-sm">Família para pertencer</span>
+            </a>
+            <nav class="hidden md:flex items-center gap-4 text-sm">
+                <a href="#inicio" class="border-b-2 border-secondary pb-1 font-bold">Início</a>
+                <a href="#celulas" class="hover:text-secondary transition-colors">Células</a>
+                <a href="#eventos" class="hover:text-secondary transition-colors">Programação</a>
+                <a href="eventos.html" class="hover:text-secondary transition-colors font-bold text-secondary">Eventos</a>
+                <a href="#transmissoes" class="hover:text-secondary transition-colors flex items-center gap-1">
+                    <i class="fa fa-play-circle text-xs"></i> Ao Vivo
+                </a>
+                <a href="fotos.html" class="hover:text-secondary transition-colors">Fotos</a>
+                <a href="#oracao" class="hover:text-secondary transition-colors flex items-center gap-1">
+                    <i class="fa fa-heart text-xs"></i> Oração
+                </a>
+                <a href="#doacao" class="hover:text-secondary transition-colors">Doação</a>
+                <a href="adminlogin.html" class="hover:text-secondary transition-colors">Gestão</a>
+                <a href="gestao-membros.html" class="hover:text-secondary transition-colors">Membros</a>
+            </nav>
+            <div class="hidden md:flex items-center gap-3">
+                <a href="cadastro.html" class="bg-secondary text-primary px-4 py-2 rounded-md font-bold text-sm hover:bg-yellow-400 transition-colors">
+                    <i class="fa fa-user-plus mr-1"></i> Seja Membro
+                </a>
+                <a href="login.html" class="border border-white/40 px-4 py-2 rounded-md text-sm hover:bg-white/10 transition-colors">Entrar</a>
+            </div>
+            <button class="md:hidden text-2xl" id="btnMenu">
+                <i class="fa fa-bars"></i>
+            </button>
+        </div>
+        <!-- ✅ Menu Mobile — completo e conectado -->
+        <div id="menuMobile" class="md:hidden hidden bg-accent px-4 pb-4">
+            <nav class="flex flex-col gap-3">
+                <a href="#inicio" class="py-2 border-b border-white/20">Início</a>
+                <a href="#celulas" class="py-2 border-b border-white/20">Células</a>
+                <a href="#eventos" class="py-2 border-b border-white/20">Programação</a>
+                <a href="eventos.html" class="py-2 border-b border-white/20 font-bold text-secondary">Eventos</a>
+                <a href="#transmissoes" class="py-2 border-b border-white/20">Ao Vivo</a>
+                <a href="fotos.html" class="py-2 border-b border-white/20">Fotos</a>
+                <a href="#oracao" class="py-2 border-b border-white/20">Oração</a>
+                <a href="#doacao" class="py-2 border-b border-white/20">Doação</a>
+                <a href="adminlogin.html" class="py-2 border-b border-white/20">Gestão</a>
+                <a href="gestao-membros.html" class="py-2 border-b border-white/20">Gestão de Membros</a>
+                <div class="flex flex-col gap-2 mt-3">
+                    <a href="cadastro.html" class="bg-secondary text-primary px-4 py-2 rounded-md font-bold text-center">Seja Membro</a>
+                    <a href="login.html" class="border border-white px-4 py-2 rounded-md text-center">Entrar</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+    <main>
+        <!-- ✅ Seção Hero — IGUAL AO ORIGINAL, sem alterações -->
+        <section id="inicio" class="hero-banner text-white py-20">
+            <div class="container mx-auto px-4 text-center">
+                <p class="inline-block bg-white/10 px-4 py-1 rounded-full text-sm mb-8">● Boas-vindas à nossa família</p>
+                <h1 class="text-5xl md:text-7xl font-bold mb-4 text-secondary tracking-wider">JESUS</h1>
+                <h2 class="text-2xl md:text-3xl mb-6 font-light">Ele é o caminho, a verdade e a vida</h2>
+                <p class="text-lg md:text-xl mb-8 text-gray-200 max-w-2xl mx-auto">
+                    Uma comunidade de fé, amor e esperança. Venha crescer espiritualmente conosco.
+                </p>
+                <div id="destaqueVideo" class="max-w-2xl mx-auto mb-8 bg-black/30 rounded-xl p-6 backdrop-blur-sm">
+                    <div class="py-4">
+                        <i class="fa fa-spinner fa-spin text-2xl text-secondary"></i>
+                        <p class="mt-2">Carregando...</p>
+                    </div>
+                </div>
+                <div class="flex flex-wrap justify-center gap-4">
+                    <a href="#transmissoes" class="bg-secondary text-primary px-8 py-3 rounded-md font-bold text-lg hover:bg-yellow-400 transition-colors">
+                        <i class="fa fa-play mr-2"></i> Ver Transmissões
+                    </a>
+                    <a href="eventos.html" class="bg-white/20 hover:bg-white/30 px-8 py-3 rounded-md font-bold text-lg transition-colors border border-white/30">
+                        <i class="fa fa-calendar mr-2"></i> Eventos e Inscrições
+                    </a>
+                    <a href="#celulas" class="bg-white/20 hover:bg-white/30 px-8 py-3 rounded-md font-bold text-lg transition-colors border border-white/30">
+                        <i class="fa fa-map-marker mr-2"></i> Encontrar Célula
+                    </a>
+                </div>
+            </div>
+        </section>
+        <!-- ✅ CÉLULAS — MAPA INTERATIVO — preservado integralmente -->
+        <section id="celulas" class="py-16 bg-gray-50">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl font-bold text-center mb-4 text-primary">Encontre a Célula Mais Próxima</h2>
+                <p class="text-center text-gray-600 mb-8">Terça-feira às 20h — Veja no mapa e encontre a mais perto de você!</p>
+                <div class="max-w-3xl mx-auto mb-6">
+                    <div class="flex flex-col sm:flex-row gap-3 justify-center mb-4">
+                        <button id="btnLocalizar" class="bg-primary text-white px-6 py-3 rounded-md font-bold hover:bg-accent">
+                            <i class="fa fa-location-arrow mr-2"></i> Usar Minha Localização
+                        </button>
+                        <a href="https://www.google.com/maps/search/?api=1&query=Igreja+Batista+Nacional+Diamantino" target="_blank" 
+                           class="bg-white text-gray-700 px-6 py-3 rounded-md font-bold hover:bg-gray-100 border">
+                            <i class="fa fa-map-o mr-2"></i> Abrir no Google Maps
+                        </a>
+                    </div>
+                    <div id="resultadoProxima" class="hidden bg-white p-4 rounded-xl border-2 border-secondary shadow-sm">
+                    </div>
+                </div>
+                <div class="max-w-4xl mx-auto">
+                    <div id="mapaCelulas" class="w-full"></div>
+                    <p class="text-center text-sm text-gray-500 mt-3">
+                        Clique no marcador para ver detalhes e a distância até você
+                    </p>
+                </div>
+                <div class="max-w-4xl mx-auto mt-8">
+                    <h3 class="text-lg font-bold text-center mb-4 text-primary">Lista Rápida</h3>
+                    <div id="listaCompacta" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 text-sm">
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- ✅ PROGRAMAÇÃO — sem alterações -->
+        <section id="eventos" class="py-16 bg-white">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl font-bold text-center mb-10 text-primary">Programação Semanal</h2>
+                <div class="max-w-3xl mx-auto space-y-4">
+                    <div class="border-l-4 border-secondary pl-6 py-4 bg-white rounded-r-lg shadow-sm">
+                        <h3 class="font-bold text-xl text-primary">Terça-feira</h3>
+                        <p class="font-semibold">Células nas casas — 20:00</p>
+                        <a href="#celulas" class="text-secondary text-sm font-medium hover:underline">→ Encontrar a mais próxima no mapa</a>
+                    </div>
+                    <div class="border-l-4 border-gray-300 pl-6 py-4 bg-gray-50 rounded-r-lg">
+                        <h3 class="font-bold text-xl text-gray-600">Quinta-feira</h3>
+                        <p class="font-semibold text-gray-500">Culto da Fé — 19:30 <span class="text-gray-400 text-sm">Sem transmissão ao vivo</span></p>
+                    </div>
+                    <div class="border-l-4 border-secondary pl-6 py-4 bg-white rounded-r-lg shadow-sm">
+                        <h3 class="font-bold text-xl text-primary">Sábado</h3>
+                        <p class="font-semibold">Célula de Adolescentes — 18:00</p>
+                        <p class="font-semibold mt-1">Célula de Jovens — 20:00</p>
+                    </div>
+                    <div class="border-l-4 border-secondary pl-6 py-4 bg-white rounded-r-lg shadow-sm">
+                        <h3 class="font-bold text-xl text-primary">Domingo</h3>
+                        <p class="font-semibold">Culto de Celebração — 19:00 <span class="text-red-500 text-sm live-indicator">● AO VIVO</span></p>
+                    </div>
+                </div>
+                <div class="text-center mt-8">
+                    <a href="eventos.html" class="inline-block bg-secondary text-primary px-8 py-3 rounded-md font-bold text-lg hover:bg-yellow-400">
+                        <i class="fa fa-calendar-plus-o mr-2"></i> Ver Eventos e Fazer Inscrição
+                    </a>
+                </div>
+            </div>
+        </section>
+        <!-- ✅ TRANSMISSÕES — TAL QUAL ESTAVA FUNCIONANDO -->
+        <section id="transmissoes" class="py-16 bg-gray-50">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl font-bold text-center mb-4 text-primary">Transmissões dos Cultos</h2>
+                <p class="text-center text-gray-600 mb-8">Apenas aos Domingos às 19:00</p>
+                <div class="max-w-3xl mx-auto mb-8 bg-white p-6 rounded-xl border-2 border-secondary/30">
+                    <h3 class="text-xl font-bold text-center mb-4 text-primary">📅 Transmissões por Período</h3>
+                    <p class="text-center text-gray-500 text-sm mb-4">Clique no mês para ver os vídeos disponíveis</p>
+                    
+                    <div id="lista-meses" class="space-y-3">
+                        <div class="text-center py-4">
+                            <i class="fa fa-spinner fa-spin text-xl text-primary"></i>
+                            <p class="text-sm text-gray-500 mt-1">Carregando...</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center mt-6 space-y-4">
+                    <a href="fotos.html" class="inline-block bg-secondary text-primary px-6 py-3 rounded-md font-bold hover:bg-yellow-400 mr-2">
+                        <i class="fa fa-camera mr-2"></i> Ver Galeria de Fotos
+                    </a>
+                    <a href="https://youtube.com/@ibndiamantino/videos" target="_blank" 
+                       class="inline-block bg-primary text-white px-6 py-3 rounded-md font-bold hover:bg-accent">
+                        <i class="fa fa-youtube-play mr-2"></i> Ver TODO o histórico no YouTube
+                    </a>
+                </div>
+            </div>
+        </section>
+        <!-- ✅ ORAÇÃO — mantido -->
+        <section id="oracao" class="py-16 bg-white">
+            <div class="container mx-auto px-4 max-w-2xl">
+                <h2 class="text-3xl font-bold text-center mb-6 text-primary">Pedido de Oração</h2>
+                <p class="text-center text-lg italic text-gray-600 mb-8">"Confessai as vossas culpas uns aos outros, e orai uns pelos outros." — Tiago 5:16</p>
+                <form id="formOracao" class="space-y-4">
+                    <input type="text" placeholder="Seu nome" required class="w-full p-3 border rounded-md focus:ring-2 focus:ring-secondary outline-none">
+                    <input type="email" placeholder="Seu e-mail" required class="w-full p-3 border rounded-md focus:ring-2 focus:ring-secondary outline-none">
+                    <textarea placeholder="Seu pedido de oração" rows="4" required class="w-full p-3 border rounded-md focus:ring-2 focus:ring-secondary outline-none"></textarea>
+                    <button type="submit" class="w-full bg-primary text-white p-3 rounded-md font-bold hover:bg-accent">Enviar Pedido</button>
+                </form>
+            </div>
+        </section>
+        <!-- ✅ DOAÇÃO — com dados oficiais -->
+        <section id="doacao" class="py-16 bg-gray-50">
+            <div class="container mx-auto px-4 max-w-2xl text-center">
+                <h2 class="text-3xl font-bold mb-6 text-primary">Dízimos e Ofertas</h2>
+                <p class="text-lg italic text-gray-600 mb-8">"Deus ama ao que dá com alegria." — 2 Coríntios 9:7</p>
+                <div class="bg-white p-8 rounded-xl shadow-sm">
+                    <p class="text-sm text-gray-500 mb-2">FUNDAÇÃO MISSÃO DA IGREJA BATISTA NACIONAL DE DIAMANTINO MT</p>
+                    <p class="text-sm text-gray-500 mb-4">CNPJ: 36.158.983/0001-36</p>
+                    <h3 class="text-xl font-bold mb-4 text-primary">Chave PIX</h3>
+                    <p class="text-lg font-mono bg-gray-50 p-3 rounded border mb-4">36.158.983/0001-36</p>
+                    <button onclick="copiarPix()" class="bg-primary text-white px-6 py-3 rounded-md font-bold hover:bg-accent">
+                        <i class="fa fa-copy mr-2"></i> Copiar Chave PIX
+                    </button>
+                    <p id="msgPix" class="mt-3 text-green-600 font-bold hidden">✅ Copiado!</p>
+                </div>
+            </div>
+        </section>
+        <!-- ✅ CONTATO E LOCALIZAÇÃO -->
+        <section id="mais" class="py-16 bg-primary text-white">
+            <div class="container mx-auto px-4 text-center">
+                <h2 class="text-3xl font-bold mb-6">Contato e Localização</h2>
+                <p class="text-lg mb-2"><strong>Igreja Batista Nacional Diamantino</strong></p>
+                <p class="mb-4">Av. Ministro Gilmar Ferreira Mendes, S/N — ao lado do Sicredi<br>Diamantino — MT</p>
+                <p class="mb-4"><i class="fa fa-whatsapp"></i> <a href="tel:+5565996292021" class="text-secondary font-bold">(65) 9 9629-2021</a></p>
+                <a href="https://www.google.com/maps/search/?api=1&query=Av.+Ministro+Gilmar+Ferreira+Mendes,Diamantino-MT" target="_blank" 
+                   class="inline-block bg-secondary text-primary px-6 py-3 rounded-md font-bold hover:bg-yellow-400">
+                    <i class="fa fa-map-marker mr-2"></i> Como Chegar →
+                </a>
+            </div>
+        </section>
+    </main>
+    <!-- ✅ RODAPÉ -->
+    <footer class="bg-dark text-white py-8 text-center mb-10">
+        <p class="text-xl font-bold text-secondary mb-2">Igreja Batista Nacional Diamantino</p>
+        <p class="text-sm text-gray-400">© 2026 — "Eu e a minha Casa serviremos ao Senhor." — Josué 24:15</p>
+    </footer>
+    <!-- ✅ RÁDIO IBN -->
+    <div class="radio-bar">
+        <button class="text-xl" title="Reproduzir">
+            <i class="fa fa-play-circle"></i>
+        </button>
+        <span class="font-semibold">Rádio IBN</span>
+        <span id="statusAoVivo" class="text-xs text-gray-300 ml-auto">Verificando...</span>
+    </div>
+    <!-- ✅ GOOGLE MAPS API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAYZpzdj26wl8lob7ZX3VBxilRyCTpZ3x4&language=pt-BR&region=BR"></script>
+    <script>
+        const API_KEY = "AIzaSyAYZpzdj26wl8lob7ZX3VBxilRyCTpZ3x4";
+        const QTD_POR_CARGA = 50;
+        let canalId = "";
+        let proximaPagina = "";
+        let todosOsVideos = [];
+        let carregando = false;
+        let promptInstalacao = null;
+        let ultimoVideo = null;
+        let estaAoVivo = false;
+        let carregueiTudo = false;
+        // ✅ DADOS DAS CÉLULAS — mantidos exatamente como estavam
+        const celulas = [
+            { nome: "Célula Somos a Igreja", endereco: "Rua Pirarara, nº 97 — Solar, Novo Diamantino", lat: -14.4052, lng: -56.4318 },
+            { nome: "Célula Gênesis", endereco: "Rua das Paineiras, nº 541 — Centro, Novo Diamantino", lat: -14.4085, lng: -56.4295 },
+            { nome: "Célula Fonte de Água Viva", endereco: "Rua Jacarandá, nº 321 — Centro, Novo Diamantino", lat: -14.4078, lng: -56.4302 },
+            { nome: "Célula Ebenézer", endereco: "Rua Cajarana, nº 533 — Bom Jesus, Novo Diamantino", lat: -14.4035, lng: -56.4280 },
+            { nome: "Célula Shamah", endereco: "Rua 5 Alta Floresta, nº 241 — Bom Jesus, Novo Diamantino", lat: -14.4028, lng: -56.4265 },
+            { nome: "Célula Morada", endereco: "Rua B, nº 25 — Buriti, Diamantino (Velho)", lat: -14.4155, lng: -56.4420 },
+            { nome: "Célula Atos 2", endereco: "Próx. ginásio de esportes — Buriti, Diamantino (Velho)", lat: -14.4168, lng: -56.4435 },
+            { nome: "Célula Primeiro Mandamento", endereco: "Rua Manoel Ferreira de Arruda, nº 33 — Buriti, Diamantino (Velho)", lat: -14.4182, lng: -56.4450 },
+            { nome: "Célula Missão", endereco: "Alto Paraguai — MT", lat: -14.5120, lng: -56.4850 }
+        ];
+        let mapa = null;
+        let marcadores = [];
+        let posicaoUsuario = null;
+        function calcularDistancia(lat1, lng1, lat2, lng2) {
+            const R = 6371;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLng = (lng2 - lng1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLng/2) * Math.sin(dLng/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            const km = R * c;
+            if (km < 1) return `${Math.round(km * 1000)} m`;
+            return `${km.toFixed(1)} km`;
+        }
+        function initMap() {
+            const centro = { lat: -14.4100, lng: -56.4350 };
+            mapa = new google.maps.Map(document.getElementById('mapaCelulas'), {
+                zoom: 13,
+                center: centro,
+                language: 'pt-BR'
+            });
+            celulas.forEach((celula, idx) => {
+                const marcador = new google.maps.Marker({
+                    position: { lat: celula.lat, lng: celula.lng },
+                    map: mapa,
+                    title: celula.nome,
+                    icon: { url: 'https://maps.google.com/mapfiles/ms/icons/red-dot.png', scaledSize: new google.maps.Size(32, 32) }
+                });
+                const janela = new google.maps.InfoWindow({
+                    content: `
+                        <div style="min-width: 220px; padding: 4px;">
+                            <h4 style="font-weight: bold; margin: 0 0 6px 0; color: #0A1A3F;">${celula.nome}</h4>
+                            <p style="font-size: 13px; color: #555; margin: 0 0 8px 0;">${celula.endereco}</p>
+                            <a href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(celula.endereco + ', Diamantino MT')}" 
+                               target="_blank" style="color: #D4AF37; font-weight: bold; text-decoration: none; font-size: 13px;">
+                                <i class="fa fa-directions"></i> Como Chegar →
+                            </a>
+                        </div>
+                    `
+                });
+                marcador.addListener('click', () => janela.open(mapa, marcador));
+                marcador.celulaIdx = idx;
+                marcadores.push(marcador);
+            });
+            renderizarListaCompacta();
+        }
+        document.getElementById('btnLocalizar').addEventListener('click', () => {
+            const resultadoDiv = document.getElementById('resultadoProxima');
+            resultadoDiv.classList.remove('hidden');
+            resultadoDiv.innerHTML = `<p class="text-center text-gray-500"><i class="fa fa-spinner fa-spin"></i> Obtendo sua localização...</p>`;
+            if (!navigator.geolocation) {
+                resultadoDiv.innerHTML = `<p class="text-red-500 text-center">Seu navegador não suporta localização.</p>`;
+                return;
+            }
+            navigator.geolocation.getCurrentPosition(
+                (posicao) => {
+                    posicaoUsuario = { lat: posicao.coords.latitude, lng: posicao.coords.longitude };
+                    new google.maps.Marker({
+                        position: posicaoUsuario,
+                        map: mapa,
+                        title: "Você está aqui",
+                        icon: { url: 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png', scaledSize: new google.maps.Size(32, 32) }
+                    });
+                    mapa.setCenter(posicaoUsuario);
+                    mapa.setZoom(13);
+                    const comDistancia = celulas.map((c, idx) => ({
+                        ...c, idx,
+                        distanciaTexto: calcularDistancia(posicaoUsuario.lat, posicaoUsuario.lng, c.lat, c.lng)
+                    })).sort((a, b) => parseFloat(a.distanciaTexto) - parseFloat(b.distanciaTexto));
+                    const maisProxima = comDistancia[0];
+                    marcadores[maisProxima.idx].setIcon({
+                        url: 'https://maps.google.com/mapfiles/ms/icons/yellow-dot.png',
+                        scaledSize: new google.maps.Size(40, 40)
+                    });
+                    resultadoDiv.innerHTML = `
+                        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                            <div>
+                                <p class="font-bold text-primary mb-1">⭐ Célula mais próxima de você:</p>
+                                <p class="font-bold text-lg text-secondary">${maisProxima.nome}</p>
+                                <p class="text-sm text-gray-600">${maisProxima.endereco}</p>
+                                <p class="text-sm font-semibold text-green-600 mt-1">
+                                    <i class="fa fa-location-arrow"></i> Distância: ${maisProxima.distanciaTexto}
+                                </p>
+                            </div>
+                            <a href="https://www.google.com/maps/dir/?api=1&origin=${posicaoUsuario.lat},${posicaoUsuario.lng}&destination=${encodeURIComponent(maisProxima.endereco + ', Diamantino MT')}" 
+                               target="_blank" class="bg-secondary text-primary px-5 py-2 rounded-md font-bold hover:bg-yellow-400 whitespace-nowrap text-center">
+                                <i class="fa fa-map-marker mr-1"></i> Traçar Rota
+                            </a>
+                        </div>
+                    `;
+                    atualizarListaComDistancias(comDistancia);
+                },
+                (erro) => {
+                    resultadoDiv.innerHTML = `<p class="text-red-500 text-center">Não foi possível acessar sua localização.</p>`;
+                },
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+            );
+        });
+        function renderizarListaCompacta(distancias = null) {
+            const container = document.getElementById('listaCompacta');
+            let lista = distancias || celulas;
+            container.innerHTML = lista.map(c => {
+                const link = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(c.endereco + ', Diamantino MT')}`;
+                return `
+                    <a href="${link}" target="_blank" class="p-3 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow border">
+                        <p class="font-bold text-primary text-sm">${c.nome}</p>
+                        <p class="text-xs text-gray-500 mt-1">${c.endereco.split(' — ')[0]}</p>
+                        ${c.distanciaTexto ? `<p class="text-xs font-semibold text-secondary mt-1">${c.distanciaTexto}</p>` : ''}
+                    </a>
+                `;
+            }).join('');
+        }
+        function atualizarListaComDistancias(ordenadas) { renderizarListaCompacta(ordenadas); }
+        window.initMap = initMap;
+        // ✅ PWA — Instalação
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            promptInstalacao = e;
+            setTimeout(() => { document.getElementById('installBanner').style.display = 'block'; }, 3000);
+        });
+        document.getElementById('btnFecharAviso').addEventListener('click', () => {
+            document.getElementById('installBanner').style.display = 'none';
+        });
+        document.getElementById('btnInstalar').addEventListener('click', async () => {
+            if (!promptInstalacao) {
+                alert('📱 Android: 3 pontinhos → "Instalar aplicativo"\n📱 iPhone: Compartilhar → "Adicionar à Tela de Início"');
+                return;
+            }
+            const res = await promptInstalacao.prompt();
+            if (res.outcome === 'accepted') alert('✅ App IBN instalado!');
+            document.getElementById('installBanner').style.display = 'none';
+            promptInstalacao = null;
+        });
+        // ✅ Menu Mobile
+        document.getElementById('btnMenu').addEventListener('click', () => {
+            document.getElementById('menuMobile').classList.toggle('hidden');
+        });
+        // ✅ Vídeos YouTube — sem alterações
+        function extrairDataDoTitulo(titulo, dataPublicacao) {
+            const match = titulo.match(/(\d{1,2})[\/\.](\d{1,2})[\/\.](\d{2,4})/);
+            if (match) {
+                let dia = parseInt(match[1]), mes = parseInt(match[2]) - 1, ano = match[3].length === 2 ? 2000 + parseInt(match[3]) : parseInt(match[3]);
+                const dt = new Date(ano, mes, dia);
+                if (!isNaN(dt.getTime()) && dt.getFullYear() >= 2010) return dt;
+            }
+            return new Date(dataPublicacao);
+        }
+        function nomeMes(data) {
+            const m = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+            return `${m[data.getMonth()]} de ${data.getFullYear()}`;
+        }
+        async function buscarCanalId() {
+            const res = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=ibndiamantino&type=channel&key=${API_KEY}`);
+            const d = await res.json();
+            if (!d.items?.length) throw "Canal não encontrado";
+            canalId = d.items[0].id.channelId;
+        }
+        async function verificarAoVivo() {
+            try {
+                if (!canalId) await buscarCanalId();
+                const resLive = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${canalId}&eventType=live&type=video&key=${API_KEY}`);
+                const live = await resLive.json();
+                if (live.items?.length) {
+                    estaAoVivo = true;
+                    const v = live.items[0];
+                    ultimoVideo = { id: v.id.videoId, titulo: v.snippet.title, capa: v.snippet.thumbnails.medium.url, dataStr: '🔴 AO VIVO AGORA!' };
+                } else {
+                    estaAoVivo = false;
+                    const resUlt = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${canalId}&maxResults=1&order=date&type=video&key=${API_KEY}`);
+                    const ult = await resUlt.json();
+                    if (ult.items?.length) {
+                        const v = ult.items[0];
+                        const pub = new Date(v.snippet.publishedAt);
+                        const real = extrairDataDoTitulo(v.snippet.title, pub);
+                        ultimoVideo = { id: v.id.videoId, titulo: v.snippet.title, capa: v.snippet.thumbnails.medium.url, dataStr: real.toLocaleDateString('pt-BR') };
+                    }
+                }
+                atualizarDestaque();
+                atualizarStatusBar();
+            } catch (e) { console.error(e); }
+        }
+        function atualizarDestaque() {
+            const c = document.getElementById('destaqueVideo');
+            if (!ultimoVideo) { c.innerHTML = '<p>Acesse nosso canal no YouTube</p>'; return; }
+            const etiq = estaAoVivo 
+                ? '<span class="text-red-400 font-bold live-indicator">🔴 TRANSMISSÃO AO VIVO AGORA!</span>'
+                : `<span class="text-gray-300">Última transmissão — ${ultimoVideo.dataStr}</span>`;
+            c.innerHTML = `${etiq}<a href="https://youtu.be/${ultimoVideo.id}" target="_blank" class="block mt-4"><img src="${ultimoVideo.capa}" class="w-full max-w-md mx-auto rounded-lg"><p class="mt-3 font-bold text-lg">${ultimoVideo.titulo}</p><span class="inline-block mt-2 bg-secondary text-primary px-4 py-2 rounded-md font-bold"><i class="fa ${estaAoVivo?'fa-broadcast-tower':'fa-play'} mr-2"></i> ${estaAoVivo?'Assistir Agora':'Ver Último Culto'}</span></a>`;
+        }
+        function atualizarStatusBar() {
+            const b = document.getElementById('statusAoVivo');
+            b.innerHTML = estaAoVivo ? '<span class="text-red-400 live-indicator font-bold">🔴 AO VIVO</span>' : `<span class="text-gray-400">Última: ${ultimoVideo?.dataStr || '---'}</span>`;
+        }
+        async function carregarMaisVideos() {
+            if (carregando || carregueiTudo) return;
+            carregando = true;
+            try {
+                if (!canalId) await buscarCanalId();
+                let url = `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${canalId}&maxResults=${QTD_POR_CARGA}&order=date&type=video&key=${API_KEY}`;
+                if (proximaPagina) url += `&pageToken=${proximaPagina}`;
+                const res = await fetch(url);
+                const d = await res.json();
+                proximaPagina = d.nextPageToken || '';
+                if (!d.items?.length) { carregueiTudo = true; return; }
+                const novos = d.items.map(v => {
+                    const pub = new Date(v.snippet.publishedAt);
+                    const real = extrairDataDoTitulo(v.snippet.title, pub);
+                    return { id: v.id.videoId, titulo: v.snippet.title, dataReal: real, mesAno: nomeMes(real), dataStr: real.toLocaleDateString('pt-BR'), capa: v.snippet.thumbnails.medium.url };
+                });
+                todosOsVideos.push(...novos);
+                todosOsVideos.sort((a,b) => b.dataReal - a.dataReal);
+                if (!proximaPagina) carregueiTudo = true;
+                agruparEMostrar();
+            } catch (e) { console.error(e); }
+            finally { carregando = false; }
+        }
+        function agruparEMostrar() {
+            const c = document.getElementById('lista-meses');
+            const grupos = {};
+            todosOsVideos.forEach(v => { if (!grupos[v.mesAno]) grupos[v.mesAno] = []; grupos[v.mesAno].push(v); });
+            const ord = Object.keys(grupos).sort((a,b) => {
+                const [ma, aa] = a.split(' de '); const [mb, ab] = b.split(' de ');
+                const m = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+                return new Date(aa, m.indexOf(ma), 1) - new Date(ab, m.indexOf(mb), 1);
+            }).reverse();
+            let html = '';
+            ord.forEach((mes, idx) => {
+                const vs = grupos[mes]; const abr = idx === 0;
+                html += `<div class="border-b last:border-0"><h4 class="month-toggle flex justify-between py-3 font-bold text-primary" data-mes="${mes}"><span>${mes}</span><span class="text-sm text-gray-500">${vs.length} vídeo${vs.length!==1?'s':''}</span><i class="fa fa-chevron-down transition-transform ${abr?'rotate-180':''}" id="ic-${mes.replace(/\s/g,'-')}"></i></h4><div class="month-videos ${abr?'expanded':'collapsed'}" id="ct-${mes.replace(/\s/g,'-')}"><div class="space-y-3 pb-3">${vs.map(v=>`<a href="https://youtu.be/${v.id}" target="_blank" class="flex gap-3 p-2 bg-gray-50 rounded-lg"><img src="${v.capa}" class="w-28 h-16 object-cover rounded"><div><p class="font-semibold text-sm">${v.titulo}</p><p class="text-xs text-gray-500 mt-1">${v.dataStr}</p></div></a>`).join('')}</div></div></div>`;
+            });
+            if (!carregueiTudo) html += `<div class="pt-4 text-center"><button id="btnMais" class="bg-secondary text-primary px-6 py-2 rounded font-bold">Carregar meses anteriores</button></div>`;
+            else html += '<p class="text-center text-gray-400 text-sm pt-4">✅ Todos carregados</p>';
+            c.innerHTML = html;
+            document.querySelectorAll('.month-toggle').forEach(t => {
+                t.addEventListener('click', () => {
+                    const id = t.dataset.mes.replace(/\s/g,'-');
+                    const ct = document.getElementById(`ct-${id}`);
+                    const ic = document.getElementById(`ic-${id}`);
+                    ct.classList.toggle('expanded'); ct.classList.toggle('collapsed');
+                    ic.classList.toggle('rotate-180');
+                });
+            });
+            const btn = document.getElementById('btnMais');
+            if (btn) btn.addEventListener('click', () => { btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i>'; btn.disabled = true; carregarMaisVideos(); });
+        }
+        function copiarPix() {
+            navigator.clipboard.writeText("36158983000136");
+            const m = document.getElementById('msgPix'); 
+            m.classList.remove('hidden'); 
+            setTimeout(() => m.classList.add('hidden'), 3000);
+        }
+        window.onload = async () => {
+            await buscarCanalId();
+            verificarAoVivo();
+            carregarMaisVideos();
+        };
+    </script>
+</body>
+</html>
