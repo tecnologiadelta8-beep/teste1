@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Membros — IBN Diamantino</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0A1A3F',
+                        secondary: '#D4AF37',
+                        accent: '#1E3A8A',
+                        light: '#F8F9FC',
+                        dark: '#0F172A'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        html { scroll-behavior: smooth; }
+        body { background: linear-gradient(135deg, #0A1A3F 0%, #1E3A8A 100%); }
+        .linha-par { background-color: rgba(255,255,255,0.03); }
+        .linha-impar { background-color: rgba(255,255,255,0.08); }
+    </style>
+</head>
+<body class="min-h-screen text-white font-sans antialiased">
+
+    <header class="bg-primary/90 backdrop-blur-sm py-4 shadow-md">
+        <div class="container mx-auto px-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <span class="w-10 h-10 rounded-full bg-secondary text-primary flex items-center justify-center font-bold text-lg">IB</span>
+                <span class="font-bold text-lg">Gestão de Membros — IBN Diamantino</span>
+            </div>
+            <a href="cadastro.html" class="text-white hover:text-secondary text-sm">
+                <i class="fa fa-user-plus mr-1"></i> Novo Cadastro
+            </a>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-10 max-w-6xl">
+
+        <!-- TELA DE LOGIN -->
+        <div id="telaLogin" class="max-w-md mx-auto">
+            <div class="bg-white/10 backdrop-blur-md rounded-2xl p-8 shadow-xl">
+                <h2 class="text-2xl font-bold text-center mb-6">🔐 Acesso Restrito</h2>
+                <p class="text-gray-300 text-center mb-6">Apenas gestores autorizados</p>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block font-semibold mb-2">Senha de Acesso</label>
+                        <input type="password" id="senhaGestor"
+                            class="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/50 text-white"
+                            placeholder="Digite a senha">
+                    </div>
+                    <button id="btnEntrar"
+                        class="w-full bg-secondary text-primary font-bold py-3 px-6 rounded-lg hover:bg-yellow-400 transition-colors">
+                        <i class="fa fa-sign-in mr-2"></i> Entrar
+                    </button>
+                    <p id="erroLogin" class="text-red-400 text-center hidden">Senha incorreta!</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAINEL PRINCIPAL — APARECE APÓS LOGIN -->
+        <div id="painelGestao" class="hidden">
+            
+            <!-- Cabeçalho + Ações -->
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+                <div>
+                    <h2 class="text-2xl font-bold">📋 Lista de Membros</h2>
+                    <p class="text-gray-300"><span id="totalCadastros">0</span> cadastros registrados</p>
+                </div>
+                <div class="flex flex-wrap gap-3">
+                    <button id="btnExportarCSV"
+                        class="bg-green-600 hover:bg-green-500 px-5 py-2.5 rounded-lg font-semibold transition-colors">
+                        <i class="fa fa-file-text-o mr-2"></i> Baixar CSV
+                    </button>
+                    <button id="btnLimparTodos"
+                        class="bg-red-600/80 hover:bg-red-500 px-5 py-2.5 rounded-lg font-semibold transition-colors">
+                        <i class="fa fa-trash-o mr-2"></i> Limpar Tudo
+                    </button>
+                    <button id="btnSair"
+                        class="bg-gray-600/80 hover:bg-gray-500 px-5 py-2.5 rounded-lg font-semibold transition-colors">
+                        <i class="fa fa-sign-out mr-2"></i> Sair
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filtros de Busca -->
+            <div class="bg-white/10 rounded-xl p-5 mb-6">
+                <div class="grid md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">🔍 Buscar por Nome</label>
+                        <input type="text" id="filtroNome"
+                            class="w-full px-3 py-2.5 rounded-lg bg-white/10 border border-white/20 focus:border-secondary focus:outline-none text-white"
+                            placeholder="Digite o nome...">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">🏘️ Filtrar por Célula</label>
+                        <select id="filtroCelula"
+                            class="w-full px-3 py-2.5 rounded-lg bg-white/10 border border-white/20 focus:border-secondary focus:outline-none text-white">
+                            <option value="" class="bg-primary">Todas as células</option>
+                            <option value="Célula Somos a Igreja" class="bg-primary">Somos a Igreja</option>
+                            <option value="Célula Gênesis" class="bg-primary">Gênesis</option>
+                            <option value="Célula Fonte de Água Viva" class="bg-primary">Fonte de Água Viva</option>
+                            <option value="Célula Ebenézer" class="bg-primary">Ebenézer</option>
+                            <option value="Célula Shamah" class="bg-primary">Shamah</option>
+                            <option value="Célula Morada" class="bg-primary">Morada</option>
+                            <option value="Célula Atos 2" class="bg-primary">Atos 2</option>
+                            <option value="Célula Primeiro Mandamento" class="bg-primary">Primeiro Mandamento</option>
+                            <option value="Célula Missão" class="bg-primary">Missão</option>
+                            <option value="Célula de Adolescentes" class="bg-primary">Adolescentes (Sábado)</option>
+                            <option value="Célula de Jovens" class="bg-primary">Jovens (Sábado)</option>
+                            <option value="Não participa" class="bg-primary">Não participa de célula</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">💧 Batismo</label>
+                        <select id="filtroBatismo"
+                            class="w-full px-3 py-2.5 rounded-lg bg-white/10 border border-white/20 focus:border-secondary focus:outline-none text-white">
+                            <option value="" class="bg-primary">Todos</option>
+                            <option value="sim" class="bg-primary">Batizado(a)</option>
+                            <option value="nao" class="bg-primary">Não batizado(a)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabela de Dados -->
+            <div class="overflow-x-auto rounded-xl border border-white/10">
+                <table class="w-full text-sm">
+                    <thead class="bg-white/10">
+                        <tr class="text-left font-bold">
+                            <th class="p-3">Código</th>
+                            <th class="p-3">Nome Completo</th>
+                            <th class="p-3">Nascimento</th>
+                            <th class="p-3">Batismo</th>
+                            <th class="p-3">Célula</th>
+                            <th class="p-3">Telefone</th>
+                            <th class="p-3">Data Cadastro</th>
+                            <th class="p-3 text-center">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="corpoTabela">
+                        <!-- Dados carregados via JS -->
+                        <tr>
+                            <td colspan="8" class="p-8 text-center text-gray-400">Carregando...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Detalhes do Membro (expandir) -->
+            <div id="detalhesMembro" class="hidden mt-6 bg-white/10 rounded-xl p-6">
+                <h3 class="text-xl font-bold mb-4">📝 Detalhes do Membro</h3>
+                <div id="conteudoDetalhes" class="grid md:grid-cols-2 gap-4 text-sm"></div>
+                <div class="mt-4 flex gap-3">
+                    <button id="btnFecharDetalhes" class="bg-gray-600/80 hover:bg-gray-500 px-4 py-2 rounded-lg">
+                        Fechar
+                    </button>
+                    <button id="btnExcluirRegistro" class="bg-red-600/80 hover:bg-red-500 px-4 py-2 rounded-lg">
+                        <i class="fa fa-trash mr-1"></i> Excluir Registro
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <footer class="text-center py-6 text-sm text-gray-400 mt-10">
+        <p>© 2026 — Igreja Batista Nacional Diamantino | Painel de Gestão</p>
+    </footer>
+
+    <script>
+        // ================= SENHA DE ACESSO =================
+        // VOCÊ PODE ALTERAR A SENHA ABAIXO QUANDO QUISER
+        const SENHA_GESTOR = 'ibndiamantino2026'; // ← Mude aqui!
+
+        // ================= CONTROLE DE TELAS =================
+        const telaLogin = document.getElementById('telaLogin');
+        const painelGestao = document.getElementById('painelGestao');
+        const btnEntrar = document.getElementById('btnEntrar');
+        const btnSair = document.getElementById('btnSair');
+        const senhaInput = document.getElementById('senhaGestor');
+        const erroLogin = document.getElementById('erroLogin');
+
+        btnEntrar.addEventListener('click', () => {
+            if (senhaInput.value === SENHA_GESTOR) {
+                telaLogin.classList.add('hidden');
+                painelGestao.classList.remove('hidden');
+                carregarLista();
+            } else {
+                erroLogin.classList.remove('hidden');
+                senhaInput.value = '';
+                senhaInput.focus();
+            }
+        });
+
+        btnSair.addEventListener('click', () => {
+            painelGestao.classList.add('hidden');
+            telaLogin.classList.remove('hidden');
+            senhaInput.value = '';
+            erroLogin.classList.add('hidden');
+            detalhesMembro.classList.add('hidden');
+        });
+
+        // ================= CARREGAR LISTA =================
+        let todosDados = [];
+        let indiceSelecionado = null;
+
+        function carregarLista() {
+            todosDados = JSON.parse(localStorage.getItem('cadastrosIBN') || '[]');
+            aplicarFiltros();
+            document.getElementById('totalCadastros').textContent = todosDados.length;
+        }
+
+        // ================= FILTROS =================
+        const filtroNome = document.getElementById('filtroNome');
+        const filtroCelula = document.getElementById('filtroCelula');
+        const filtroBatismo = document.getElementById('filtroBatismo');
+        const corpoTabela = document.getElementById('corpoTabela');
+        const detalhesMembro = document.getElementById('detalhesMembro');
+        const conteudoDetalhes = document.getElementById('conteudoDetalhes');
+
+        [filtroNome, filtroCelula, filtroBatismo].forEach(f => {
+            f.addEventListener('input', aplicarFiltros);
+        });
+
+        function aplicarFiltros() {
+            const termoNome = filtroNome.value.toLowerCase().trim();
+            const termoCelula = filtroCelula.value;
+            const termoBatismo = filtroBatismo.value;
+
+            const filtrados = todosDados.filter((dado, idx) => {
+                if (termoNome && !dado.nome.toLowerCase().includes(termoNome)) return false;
+                if (termoCelula && !dado.celulas.includes(termoCelula) && !dado.celulas.includes(termoCelula === 'Não participa' ? 'Não participa' : 'XXX')) return false;
+                if (termoBatismo && dado.batizado !== termoBatismo) return false;
+                return true;
+            });
+
+            renderizarTabela(filtrados);
+        }
+
+        function renderizarTabela(lista) {
+            if (lista.length === 0) {
+                corpoTabela.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-gray-400">Nenhum cadastro encontrado.</td></tr>`;
+                return;
+            }
+
+            corpoTabela.innerHTML = lista.map((dado, pos) => {
+                const idxReal = todosDados.indexOf(dado);
+                const linhaClasse = pos % 2 === 0 ? 'linha-par' : 'linha-impar';
+                const batizadoIcone = dado.batizado === 'sim' ? '✅' : '❌';
+                const celulaResumo = dado.celulas.length > 35 ? dado.celulas.substring(0,32)+'...' : dado.celulas;
+
+                return `
+                <tr class="${linhaClasse} border-b border-white/5 hover:bg-white/10 cursor-pointer" data-indice="${idxReal}">
+                    <td class="p-3 font-mono text-xs">${dado.id}</td>
+                    <td class="p-3 font-semibold">${dado.nome}</td>
+                    <td class="p-3">${dado.dataNascimento}</td>
+                    <td class="p-3">${batizadoIcone}</td>
+                    <td class="p-3 text-xs max-w-[200px] truncate">${celulaResumo}</td>
+                    <td class="p-3 text-xs">${dado.telefone}</td>
+                    <td class="p-3 text-xs text-gray-400">${dado.dataCadastro.split(' ')[0]}</td>
+                    <td class="p-3 text-center">
+                        <button class="ver-detalhes text-secondary hover:text-yellow-300" data-indice="${idxReal}">
+                            <i class="fa fa-eye"></i> Ver
+                        </button>
+                    </td>
+                </tr>`;
+            }).join('');
+
+            // Clique para ver detalhes
+            document.querySelectorAll('.ver-detalhes').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const idx = parseInt(btn.dataset.indice);
+                    mostrarDetalhes(idx);
+                });
+            });
+        }
+
+        // ================= DETALHES DO MEMBRO =================
+        function mostrarDetalhes(indice) {
+            indiceSelecionado = indice;
+            const d = todosDados[indice];
+            
+            conteudoDetalhes.innerHTML = `
+                <div>
+                    <p class="text-gray-400">Código</p>
+                    <p class="font-mono font-bold">${d.id}</p>
+                </div>
+                <div>
+                    <p class="text-gray-400">Nome Completo</p>
+                    <p class="font-bold">${d.nome}</p>
+                </div>
+                <div>
+                    <p class="text-gray-400">Data de Nascimento</p>
+                    <p>${d.dataNascimento}</p>
+                </div>
+                <div>
+                    <p class="text-gray-400">Estado Civil</p>
+                    <p>${d.estadoCivil === 'solteiro' ? 'Solteiro(a)' : d.estadoCivil === 'casado' ? 'Casado(a)' : d.estadoCivil === 'divorciado' ? 'Divorciado(a)' : d.estadoCivil === 'viuvo' ? 'Viúvo(a)' : 'União Estável'}</p>
+                </div>
+                <div>
+                    <p class="text-gray-400">Batizado(a)</p>
+                    <p class="font-bold">${d.batizado === 'sim' ? '✅ Sim' : '❌ Não'}</p>
+                </div>
+                <div>
+                    <p class="text-gray-400">Igreja de Origem</p>
+                    <p>${d.igrejaOrigem}</p>
+                </div>
+                <div>
+                    <p class="text-gray-400">Endereço Completo</p>
+                    <p>${d.endereco}</p>
+                </div>
+                <div>
+                    <p class="text-gray-400">Telefone / WhatsApp</p>
+                    <p class="font-bold">${d.telefone}</p>
+                </div>
+                <div>
+                    <p class="text-gray-400">E-mail</p>
+                    <p>${d.email}</p>
+                </div>
+                <div>
+                    <p class="text-gray-400">Participa de Célula</p>
+                    <p class="font-bold">${d.participaCelula === 'sim' ? 'Sim' : 'Não'}</p>
+                </div>
+                <div class="md:col-span-2">
+                    <p class="text-gray-400">Célula(s) que participa</p>
+                    <p>${d.celulas.split(' | ').join('<br>')}</p>
+                </div>
+                <div class="md:col-span-2">
+                    <p class="text-gray-400">Observações</p>
+                    <p>${d.observacoes}</p>
+                </div>
+                <div>
+                    <p class="text-gray-400">Data do Cadastro</p>
+                    <p>${d.dataCadastro}</p>
+                </div>
+            `;
+
+            detalhesMembro.classList.remove('hidden');
+            detalhesMembro.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        document.getElementById('btnFecharDetalhes').addEventListener('click', () => {
+            detalhesMembro.classList.add('hidden');
+            indiceSelecionado = null;
+        });
+
+        // ================= EXCLUIR REGISTRO =================
+        document.getElementById('btnExcluirRegistro').addEventListener('click', () => {
+            if (indiceSelecionado === null) return;
+            if (!confirm('⚠️ Tem certeza que deseja EXCLUIR este cadastro?\nEsta ação não pode ser desfeita!')) return;
+            
+            todosDados.splice(indiceSelecionado, 1);
+            localStorage.setItem('cadastrosIBN', JSON.stringify(todosDados));
+            
+            detalhesMembro.classList.add('hidden');
+            indiceSelecionado = null;
+            carregarLista();
+            alert('✅ Registro excluído com sucesso!');
+        });
+
+        // ================= EXPORTAR CSV =================
+        document.getElementById('btnExportarCSV').addEventListener('click', () => {
+            if (todosDados.length === 0) {
+                alert('⚠️ Nenhum cadastro para exportar!');
+                return;
+            }
+
+            // Cabeçalho do CSV
+            const cabecalho = [
+                'Código',
+                'NomeCompleto',
+                'DataNascimento',
+                'EstadoCivil',
+                'Batizado',
+                'IgrejaDeOrigem',
+                'EnderecoCompleto',
+                'TelefoneWhatsApp',
+                'Email',
+                'ParticipaDeCelula',
+                'CelulasQueParticipa',
+                'Observacoes',
+                'DataHoraCadastro'
+            ].join(';');
+
+            // Linhas de dados
+            const linhas = todosDados.map(d => [
+                d.id,
+                `"${(d.nome || '').replace(/"/g, '""')}"`,
+                d.dataNascimento,
+                d.estadoCivil,
+                d.batizado === 'sim' ? 'Sim' : 'Não',
+                `"${(d.igrejaOrigem || '').replace(/"/g, '""')}"`,
+                `"${(d.endereco || '').replace(/"/g, '""')}"`,
+                d.telefone,
+                d.email,
+                d.participaCelula === 'sim' ? 'Sim' : 'Não',
+                `"${(d.celulas || '').replace(/"/g, '""')}"`,
+                `"${(d.observacoes || '').replace(/"/g, '""')}"`,
+                d.dataCadastro
+            ].join(';'));
+
+            const csv = '\uFEFF' + cabecalho + '\n' + linhas.join('\n');
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `membros_ibndiamantino_${new Date().toLocaleDateString('pt-BR').replaceAll('/','-')}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            alert(`✅ CSV gerado com ${todosDados.length} registros!\nPronto para abrir no Excel ou planilhas.`);
+        });
+
+        // ================= LIMPAR TUDO =================
+        document.getElementById('btnLimparTodos').addEventListener('click', () => {
+            if (!confirm('⚠️ ATENÇÃO!\n\nVocê está prestes a APAGAR TODOS os cadastros!\nEsta ação NÃO pode ser desfeita!\n\nTem CERTEZA absoluta?')) return;
+            if (!confirm('⚠️ ÚLTIMA CHANCE — Confirma apagar TODOS os registros?')) return;
+            
+            localStorage.removeItem('cadastrosIBN');
+            carregarLista();
+            detalhesMembro.classList.add('hidden');
+            alert('✅ Todos os cadastros foram removidos!');
+        });
+    </script>
+</body>
+</html>
